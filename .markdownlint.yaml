@@ -1,0 +1,5 @@
+default: true
+
+# Match sibling setup-scripts repos: prose and tables exceed 80 columns.
+MD013: false
+MD060: false

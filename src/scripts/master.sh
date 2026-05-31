@@ -1,30 +1,34 @@
 #!/bin/bash
 
-workingDirectory=$(pwd)
+# Full provisioning: interleaved installs and configuration for headless/CLI Linux
+# (servers, cloud VMs, WSL). No desktop applications or GUI package managers.
 
-bash "$workingDirectory/src/scripts/pre-install.sh"
+# shellcheck source=utils.sh
+source "$(dirname "$0")/utils.sh"
 
-# Home directory customization
-bash "$workingDirectory/src/scripts/organizeHome.sh"
+ROOT="$(dirname "$0")"
+IDIR="$ROOT/install"
+CDIR="$ROOT/config"
 
-# CLI tools
-bash "$workingDirectory/src/scripts/cli.sh"
+run() {
+    bash "$1" 2>>"$ERROR_LOG_FILE" || log_error "Failed to execute $1"
+}
 
-# Productivity programs
-bash "$workingDirectory/src/scripts/productivity.sh" "$workingDirectory"
+run "$IDIR/pre-install.sh"
 
-# Security and privacy utilities
-bash "$workingDirectory/src/scripts/security.sh" "$workingDirectory"
+run "$CDIR/system-config.sh"
+run "$CDIR/organizeHome.sh"
 
-# IDE setup
-bash "$workingDirectory/src/scripts/ide.sh" "$workingDirectory"
+run "$IDIR/cli.sh"
 
-# Dev tools
-bash "$workingDirectory/src/scripts/dev.sh"
+run "$IDIR/dev.sh"
+run "$CDIR/dev.sh"
 
-# Penetration testing tools and wordlists
-bash "$workingDirectory/src/scripts/hacking.sh" "$workingDirectory"
+run "$IDIR/security.sh"
+run "$CDIR/security.sh"
 
-zsh "$workingDirectory/src/scripts/shell.sh" "$workingDirectory"
+run "$IDIR/shell.sh"
 
-bash "$workingDirectory/src/scripts/post-install.sh" "$workingDirectory"
+run "$IDIR/post-install.sh"
+
+run "$CDIR/shell.sh"
